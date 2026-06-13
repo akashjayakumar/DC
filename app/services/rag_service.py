@@ -34,7 +34,7 @@ async def generate_patient_summary(patient_id: str) -> str:
         visit_lines = []
         for v in visits:
             visit_lines.append(
-                f"- {v['date'][:10]}: {v['diagnosis']} → {v['treatment']}"
+                f"- {v['date'].strftime('%Y-%m-%d') if hasattr(v['date'], 'strftime') else str(v['date'])[:10]}: {v['diagnosis']} → {v['treatment']}"
                 + (f" (Notes: {v['notes']})" if v.get("notes") else "")
             )
         visit_text = "Visit history:\n" + "\n".join(visit_lines)
