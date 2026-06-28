@@ -172,7 +172,8 @@ export default function PatientDetailPage() {
     setUploading(true)
     const fd = new FormData()
     fd.append('patient_id', id)
-    fd.append('file_type', 'clinical_note')
+    const fileType = document.getElementById('uploadFileType').value
+    fd.append('file_type', fileType)
     fd.append('file', file)
     try {
       await uploadDocument(fd)
@@ -214,6 +215,17 @@ export default function PatientDetailPage() {
         </div>
         <div className="flex gap-2">
           <input ref={fileRef} type="file" className="hidden" accept=".pdf,.txt,.png,.jpg" onChange={handleUpload} />
+          <select
+            id="uploadFileType"
+            defaultValue="clinical_note"
+            className="border border-gray-200 rounded-lg px-2 py-1.5 text-[12px] text-gray-600 outline-none"
+          >
+            <option value="clinical_note">Clinical Note</option>
+            <option value="treatment_report">Treatment Report</option>
+            <option value="insurance">Insurance</option>
+            <option value="xray">X-Ray</option>
+            <option value="lab_result">Lab Result</option>
+          </select>
           <button
             onClick={() => fileRef.current.click()}
             disabled={uploading}

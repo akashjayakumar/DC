@@ -65,6 +65,29 @@ async def insurance_query(body: InsuranceQueryRequest):
     return result
 
 
+@router.post("/patient-filter")
+async def patient_filter(body: QueryRequest):
+    """Natural language filter over patient records (conditions, age, etc) — not RAG, direct DB query."""
+    from app.db.mongo import get_patients_collection
+    col = get_patients_collection()
+    all_patients = await col.find({}).to_list(length=1000)
+    for p in all_patients:
+        p["_id"] = str(p["_id"])
+
+    patient_summary = "\n".join(
+        f"- {p['name']} | age {p['age']} | conditions: {', '.join(p.get('conditions', [])) or 'none'}"
+        for p in all_patients
+    )
+    prompt = f"""Here is a list of patients:
+{patient_summary}
+
+Question: {body.query}
+
+Return ONLY the matching patient names as a simple list, one per line. If none match, say "No matching patients found."
+"""
+    answer = await llm_service.generate(prompt, system="You are a clinic data assistant. Be concise and only output names.")
+    return {"answer": answer}
+    
 @router.post("/predict-noshow")
 async def predict_no_show(body: PredictionRequest):
     """Predict whether a patient will miss their appointment."""
