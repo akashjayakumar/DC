@@ -35,5 +35,8 @@ export const getPatientSummary = (patientId) =>
 export const ragQuery = (query, patientId = null) =>
   client.post('/ai/query', { query, patient_id: patientId }).then(r => r.data)
 
+export const patientFilter = (query) =>
+  client.post('/ai/patient-filter', { query }).then(r => r.data)
+
 export const predictNoShow = (data) =>
   client.post('/ai/predict-noshow', data).then(r => r.data)

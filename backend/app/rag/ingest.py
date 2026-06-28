@@ -1,11 +1,13 @@
+from __future__ import annotations
 """
 RAG Ingestion Pipeline
 ======================
 Flow:  PDF / TXT  →  extract text  →  chunk  →  embed  →  ChromaDB
+No LangChain — uses pypdf and sentence-transformers directly.
 """
-from __future__ import annotations
 from typing import Optional
 from pathlib import Path
+from bson import ObjectId
 
 import chromadb
 from chromadb.config import Settings as ChromaSettings
@@ -115,7 +117,7 @@ async def ingest_document(document_id: str) -> int:
     Returns the number of chunks stored.
     """
     col = get_documents_collection()
-    doc = await col.find_one({"_id": document_id})
+    doc = await col.find_one({"_id": ObjectId(document_id)})
     if not doc:
         raise ValueError(f"Document {document_id} not found in MongoDB")
 
